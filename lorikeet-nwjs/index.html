@@ -1,0 +1,93 @@
+<html>
+<head>
+    <title>
+        Lorikeet
+    </title>
+    <link rel="stylesheet" href="app.css" />
+    <script src="app.js"></script>
+</head>
+<body>
+<template id="item-template">
+    <div class="item">
+        <img class="icon" />
+        <div class="filename"></div>
+    </div>
+</template>
+
+<div id="toolbar">
+    <div id="current-folder"></div>
+    <input type="search" id="search" results="5" placeholder="Search" />
+    <div style="clear: both"></div>
+    <div id="title"></div>
+    <div id="contents"></div>
+</div>
+
+<div id="main-area"></div>
+
+<script>
+    const gui = require('nw.gui');
+    const tray = new gui.Tray({title: 'My tray app', icon: 'favorite.png'})
+    const notes = [{
+        title: 'todo list',
+        contents: 'grocery shopping\npick up kids\nsend birthday party invites'
+    },{
+        title: 'grocery list',
+        contents: 'Milk\nEggs\nButter\nDouble Cream'
+    },{
+        title: 'birthday invites',
+        contents: 'Dave\nSue\nSally\nJohn and Joanna\nChris and Georgina\nElliot'
+    }]
+    const menu = new gui.Menu();
+    // notes.forEach(note => {
+    //     menu.append(new gui.MenuItem({label: note.title}));
+    // })
+    notes.map(appendNoteToMenu)
+    tray.menu = menu;
+    function displayNote(note) {
+        document.querySelector('#title').innerHTML = note.title;
+        document.querySelector('#contents').innerHTML = note.contents;
+    }
+    function appendNoteToMenu(note) {
+        const menuItem = new gui.MenuItem({
+            label: note.title,
+            click: () => displayNote(note)
+        })
+        menu.append(menuItem)
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        displayNote(notes[0]);
+    })
+    const mb = new gui.Menu({
+        type: 'menubar'
+    })
+    
+    const fileMenu = new gui.MenuItem({
+        label: 'File'
+    })
+    const otherMenu = new gui.Menu();
+    const sayHelloMenu = new gui.MenuItem({
+        label: 'say Hello',
+        click: () => alert('Hello')
+    })
+    // otherMenu.append(sayHelloMenu)
+    // fileMenu.submenu = otherMenu
+    mb.append(sayHelloMenu)
+    mb.append(fileMenu)
+
+    gui.Window.get().menu = mb;
+
+    const popmenu = new gui.Menu();
+    popmenu.append(
+        new gui.MenuItem({
+            label: 'pop up',
+            click: () => alert('poped')
+        })
+    )
+    document.querySelector('body').addEventListener('contextmenu', event => {
+        event.preventDefault();
+        popmenu.popup(event.x, event.y)
+        return false;
+    })
+</script>
+</body>
+</html>
